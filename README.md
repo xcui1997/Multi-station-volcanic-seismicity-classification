@@ -6,6 +6,9 @@ according to their peak frequency and frequency bandwidth.
 ## Requirement
 The script require python and some commonly used packages.
 
+## Data
+The three compressed packages here include part of the data of 17 stations, which can be used to test the code after decompression.
+
 ## Run the script
 You can run the test code as:
 ```
