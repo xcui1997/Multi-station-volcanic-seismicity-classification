@@ -138,6 +138,8 @@ def calculate_EM(median_amp):
         for j in range(i+1,len(median_amp)):
             median_distance[i, j] = np.sqrt(np.sum((median_amp[i][:]-median_amp[j][:])**2))/sum_amp
             median_distance[j, i] = median_distance[i, j]
+            
+    pickle.dump(np.asarray(median_distance), open('out/text/median_distance.pkl', 'wb'))
     return median_distance
 
 ######################################################################
@@ -262,13 +264,14 @@ def plot_mean_spectra(labels, amp, median_distance, mean_amp_container, sort_idx
                 horizontalalignment='right',
                 verticalalignment='center',
                 fontsize=15, transform=ax.transAxes)
-        plt.savefig('out/png/mean_spectra.pdf', format='pdf')
+    plt.savefig('out/png/mean_spectra.pdf', format='pdf')
     if whether_plot:
         plt.show()
     plt.close()
+    return len_idx
 
 
-def freq_energy_distribution(mean_amp_container, freq, sort_idx):
+def freq_energy_distribution(mean_amp_container, freq, sort_idx, len_idx):
  # calculate features and plot
     max_amp = np.max(mean_amp_container[sort_idx], axis=-1)
     max_amp_idx = np.argmax(mean_amp_container[sort_idx], axis=-1)
@@ -282,6 +285,8 @@ def freq_energy_distribution(mean_amp_container, freq, sort_idx):
     if whether_plot:
         plt.show()
     plt.close()   
+
+    np.savetxt("out/text/peak_amp_size", list(zip(peak_freq, 1./max_amp, 0.1*np.log10(np.array(len_idx)), np.arange(20))))
 
 
 
@@ -312,8 +317,8 @@ def plot_dendrogram(median_distance, n_cls):
     ax = plt.gca()
     ax.tick_params(axis='x', which='major', labelsize=20)
     ax.tick_params(axis='y', which='major', labelsize=20)
-    plt.ylabel('amp distance', fontsize= 40)
-    plt.title("Dendrogram with "+str(n_cls)+" clusters", fontsize=40)
+    # plt.ylabel('amp distance', fontsize= 40)
+    # plt.title("Dendrogram with "+str(n_cls)+" clusters", fontsize=40)
     plt.savefig('out/png/dendrogram.pdf', format='pdf')
     if whether_plot:
         plt.show()
@@ -411,11 +416,11 @@ if __name__ == '__main__':
     clust_stats(clust, whether_plot)
     # plot mean spectra
     mean_amp_container, sort_idx = freq_sort(clust.labels_, median_amp, params["n_cls"])
-    plot_mean_spectra(clust.labels_, median_amp, median_distance, mean_amp_container, sort_idx)
+    len_idx = plot_mean_spectra(clust.labels_, median_amp, median_distance, mean_amp_container, sort_idx)
     #plot 100 spectra
     plot_rep(clust, median_amp, sort_idx)
     # plot freq-evengy space
-    freq_energy_distribution(mean_amp_container, freq, sort_idx)
+    freq_energy_distribution(mean_amp_container, freq, sort_idx, len_idx)
     #save files
     new_catalog(clust.labels_, event_info, events_key, median_FI, sort_idx)
 
