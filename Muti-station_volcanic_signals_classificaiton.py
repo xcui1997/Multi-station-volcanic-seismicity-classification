@@ -371,7 +371,7 @@ if __name__ == '__main__':
     
     for name, param in dict_sta.items():
         print(name, param)
-        for sacname in glob.glob('new/'+name+"/*.SAC"):
+        for sacname in glob.glob(name+"/*.SAC"):
             tr = read(sacname)[0]
             t = np.arange(tr.stats.npts) / tr.stats.sampling_rate
             if t[-1] < 10:
